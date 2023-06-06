@@ -1,4 +1,4 @@
-import { DesignerClient } from './designer'
-import { ExpertClient } from './expert'
+import { DesignerClient } from './designer/client'
+import { ExpertClient } from './expert/client'
 
 export { DesignerClient, ExpertClient }

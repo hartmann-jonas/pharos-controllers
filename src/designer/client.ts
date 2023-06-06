@@ -16,7 +16,7 @@ import { clearInterval } from 'timers'
  * Class to define the PharosClient
  * @author Jonas Hartmann
  */
-export class ExpertClient {
+export class DesignerClient {
 	private host: string
 	private token: string | null
 	private pollTime: number
@@ -34,8 +34,8 @@ export class ExpertClient {
 		}
 	}
 
-	constructor() {
-		this.host = ''
+	constructor(host: string) {
+		this.host = host
 		this.token = ''
 		this.pollTime = 270000
 		this.poll_interval = setInterval(this.poll.bind(this), this.pollTime)
@@ -48,16 +48,15 @@ export class ExpertClient {
 	 * @param username The username for authentication.
 	 * @param password The password for authentication.
 	 */
-	async authenticate(host: string, username: string, password: string): Promise<AuthResponse> {
+	async authenticate(username: string, password: string): Promise<AuthResponse> {
 		console.log('Authenticating...')
-		if (!isIPv4(host)) {
-			console.error(`The provided host (${host}) does not match the required pattern`)
+		if (!isIPv4(this.host)) {
+			console.error(`The provided host (${this.host}) does not match the required pattern`)
 			return {
 				success: false,
-				error: `The provided host (${host}) does not match the required pattern`,
+				error: `The provided host (${this.host}) does not match the required pattern`,
 			}
 		}
-		this.host = host
 		const url = `http://${this.host}/authenticate`
 		const body = new FormData()
 		body.append('username', username)

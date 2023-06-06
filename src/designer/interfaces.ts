@@ -13,6 +13,8 @@ export interface ControlResponse {
 	error?: string
 }
 
+// INTERFACES FOR PHAROS DESIGNER
+
 export interface ControlTimelineOptions {
 	num?: number
 	fade?: number

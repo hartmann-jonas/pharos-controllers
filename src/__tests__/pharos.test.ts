@@ -3,9 +3,9 @@ import { DesignerClient } from '../'
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 test('Full Test', async () => {
-	const controller = new DesignerClient()
+	const controller = new DesignerClient('192.168.178.149')
 
-	await controller.authenticate('192.168.178.149', 'admin', 'pharos')
+	await controller.authenticate('admin', 'pharos')
 
 	const timelines = await controller.getTimelines()
 	await controller.getGroups()
@@ -20,8 +20,8 @@ test('Full Test', async () => {
 	await controller.logout()
 }, 600000)
 
-test('Fail Test', async () => {
-	const controller = new DesignerClient()
+test('Login Fail Test', async () => {
+	const controller = new DesignerClient('http://192.168.178.149')
 
-	await controller.authenticate('http://192.168.178.149', 'admin', 'pharos')
+	await controller.authenticate('admin', 'pharos')
 })

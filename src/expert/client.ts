@@ -3,12 +3,9 @@ import {
 	AuthResponse,
 	LogoutResponse,
 	ControlResponse,
-	ControlTimelineOptions,
-	ControlGroupOptions,
+	ControlSpaceOptions,
 	ControlSceneOptions,
-	TimelineResponse,
-	SceneResponse,
-	GroupResponse,
+	SpaceResponse,
 } from './interfaces'
 import { clearInterval } from 'timers'
 
@@ -16,7 +13,7 @@ import { clearInterval } from 'timers'
  * Class to define the PharosClient
  * @author Jonas Hartmann
  */
-export class DesignerClient {
+export class ExpertClient {
 	private host: string
 	private token: string | null
 	private pollTime: number
@@ -26,7 +23,7 @@ export class DesignerClient {
 	// this just calls the getGroups method every 4.5 mins
 	async poll() {
 		console.log('Polling new token')
-		const res = await this.getGroups()
+		const res = await this.getSpaces()
 		if (!res.success) {
 			console.log('Polling new token failed')
 		} else if (res.success) {
@@ -34,8 +31,8 @@ export class DesignerClient {
 		}
 	}
 
-	constructor() {
-		this.host = ''
+	constructor(host: string) {
+		this.host = host
 		this.token = ''
 		this.pollTime = 270000
 		this.poll_interval = setInterval(this.poll.bind(this), this.pollTime)
@@ -48,16 +45,16 @@ export class DesignerClient {
 	 * @param username The username for authentication.
 	 * @param password The password for authentication.
 	 */
-	async authenticate(host: string, username: string, password: string): Promise<AuthResponse> {
+	async authenticate(username: string, password: string): Promise<AuthResponse> {
 		console.log('Authenticating...')
-		if (!isIPv4(host)) {
-			console.error(`The provided host (${host}) does not match the required pattern`)
+		if (!isIPv4(this.host)) {
+			console.error(`The provided host (${this.host}) does not match the required pattern`)
 			return {
 				success: false,
-				error: `The provided host (${host}) does not match the required pattern`,
+				error: `The provided host (${this.host}) does not match the required pattern`,
 			}
 		}
-		this.host = host
+
 		const url = `http://${this.host}/authenticate`
 		const body = new FormData()
 		body.append('username', username)
@@ -158,125 +155,13 @@ export class DesignerClient {
 	}
 
 	/**
-	 * Get information about the timelines in the project.
-	 * @param timelineNumbers Optional. The timeline numbers to filter the results.
-	 * @returns An array containing the timeline objects.
-	 */
-	async getTimelines(timelineNumbers?: string): Promise<TimelineResponse> {
-		console.log(`Getting timelines${timelineNumbers ? ' ' + timelineNumbers : ''}...`)
-		const url = `http://${this.host}/api/timeline${timelineNumbers ? `?num=${timelineNumbers}` : ''}`
-		const headers = new Headers()
-		headers.append('Content-Type', 'application/json')
-		headers.append('Authorization', `Bearer ${this.token}`)
-
-		try {
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: headers,
-			})
-
-			if (response.ok) {
-				const responseData = await response.json()
-				const timelines = responseData.timelines
-				// Update token
-				if (responseData.token != undefined) {
-					this.token = responseData.token
-				}
-				console.log('Timelines recieved')
-				return {
-					success: true,
-					timelines,
-				}
-			} else if (response.status === 400) {
-				console.error('Invalid request')
-				return {
-					success: false,
-					error: 'Invalid request',
-				}
-			} else {
-				console.error('Authentification failed')
-				return {
-					success: false,
-					error: 'Authentification failed',
-				}
-			}
-		} catch (error) {
-			// Network or server error
-			console.error(`An error occured while getting the timelines: ${error}`)
-			return {
-				success: false,
-				error: `An error occured while getting the timelines: ${error}`,
-			}
-		}
-	}
-
-	/**
-	 * Control the timeline of the project.
-	 * @param action The action to perform on the timeline.
-	 * @param options Additional options for controlling the timeline.
-	 * @returns The response data from the control timeline request.
-	 */
-	async controlTimeline(
-		action: 'start' | 'release' | 'toggle' | 'pause' | 'resume' | 'set_rate' | 'set_position',
-		options: ControlTimelineOptions
-	): Promise<ControlResponse> {
-		console.log('Controlling timeline...')
-		const url = `http://${this.host}/api/timeline`
-
-		const headers = new Headers()
-		headers.append('Content-Type', 'application/json')
-		headers.append('Authorization', `Bearer ${this.token}`)
-		const body = {
-			action,
-			...options,
-		}
-
-		try {
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: headers,
-				body: JSON.stringify(body),
-			})
-			// this response returns a 204 (no-content)
-			// the docs state that a new token should be returned
-			// this is not critical since the 4.5min timer takes
-			// care of always having a valid token
-			// https://pharos-controller-api.readthedocs.io/en/latest/guide/web-api-authentication.html#token-authentication
-			if (response.status === 204) {
-				return {
-					success: true,
-				}
-			} else if (response.status === 400) {
-				console.error('Invalid request')
-				return {
-					success: false,
-					error: 'Invalid request',
-				}
-			} else {
-				console.error('Authentification failed')
-				return {
-					success: false,
-					error: 'Authentification failed',
-				}
-			}
-		} catch (error) {
-			// Network or server error
-			console.error(`An error occurred while controlling the timeline: ${error}`)
-			return {
-				success: false,
-				error: `An error occurred while controlling the timeline: ${error}`,
-			}
-		}
-	}
-
-	/**
 	 * Get information about the fixture groups in the project.
-	 * @param groupNumbers Optional. The group numbers to filter the results.
+	 * @param spaceNumbers Optional. The group numbers to filter the results.
 	 * @returns The response data containing the fixture groups.
 	 */
-	async getGroups(groupNumbers?: string): Promise<GroupResponse> {
-		console.log(`Getting groups${groupNumbers ? ' ' + groupNumbers : ''}...`)
-		const url = `http://${this.host}/api/group${groupNumbers ? `?num=${groupNumbers}` : ''}`
+	async getSpaces(spaceNumbers?: string): Promise<SpaceResponse> {
+		console.log(`Getting spaces${spaceNumbers ? ' ' + spaceNumbers : ''}...`)
+		const url = `http://${this.host}/api/group${spaceNumbers ? `?num=${spaceNumbers}` : ''}`
 		const headers = new Headers()
 		headers.append('Content-Type', 'application/json')
 		headers.append('Authorization', `Bearer ${this.token}`)
@@ -289,15 +174,15 @@ export class DesignerClient {
 
 			if (response.ok) {
 				const responseData = await response.json()
-				const groups = responseData.groups
+				const spaces = responseData.spaces
 				// Update token
 				if (responseData.token != undefined) {
 					this.token = responseData.token
 				}
-				console.log('Groups recieved')
+				console.log('Spaces recieved')
 				return {
 					success: true,
-					groups,
+					spaces,
 				}
 			} else if (response.status === 400) {
 				console.error('Invalid request')
@@ -328,8 +213,8 @@ export class DesignerClient {
 	 * @param options Additional options for controlling the group.
 	 * @returns The response data from the control group request.
 	 */
-	async controlGroup(action: 'master_intensity', options: ControlGroupOptions): Promise<ControlResponse> {
-		console.log('Controlling groups...')
+	async controlSpace(action: 'master_intensity', options: ControlSpaceOptions): Promise<ControlResponse> {
+		console.log('Controlling spaces...')
 		const url = `http://${this.host}/api/group`
 
 		const headers = new Headers()
@@ -432,56 +317,6 @@ export class DesignerClient {
 			return {
 				success: false,
 				error: `An error occurred while controlling the groups: ${error}`,
-			}
-		}
-	}
-
-	/**
-	 * Get information about the scenes in the project and their state on the controller.
-	 * @param num Optional. The scene numbers to filter the results.
-	 * @returns An array of Scene objects representing the scenes and their states.
-	 */
-	async getScenes(sceneNumbers?: string): Promise<SceneResponse> {
-		console.log(`Getting scenes${sceneNumbers ? ' ' + sceneNumbers : ''}...`)
-		const url = `http://${this.host}/api/scene${sceneNumbers ? `?num=${sceneNumbers}` : ''}`
-		const headers = new Headers()
-		headers.append('Content-Type', 'application/json')
-		headers.append('Authorization', `Bearer ${this.token}`)
-
-		try {
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: headers,
-			})
-
-			if (response.ok) {
-				const responseData = await response.json()
-				const scenes = responseData.scenes
-				// Update token
-				if (responseData.token != undefined) {
-					this.token = responseData.token
-				}
-				console.log('Scenes recieved')
-				return scenes
-			} else if (response.status === 400) {
-				console.error('Invalid request')
-				return {
-					success: false,
-					error: 'Invalid request',
-				}
-			} else {
-				console.error('Authentification failed')
-				return {
-					success: false,
-					error: 'Authentification failed',
-				}
-			}
-		} catch (error) {
-			// Network or server error
-			console.error(`An error occurred while getting the scenes: ${error}`)
-			return {
-				success: false,
-				error: `An error occurred while getting the scenes: ${error}`,
 			}
 		}
 	}
