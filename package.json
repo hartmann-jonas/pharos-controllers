@@ -1,22 +1,25 @@
 {
 	"name": "pharos-designer",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "Package to make interacting with the Pharos Designer controller via the HTTP rest API easier.",
 	"main": "index.js",
 	"scripts": {
 		"test": "jest --config jestconfig.json",
 		"build": "tsc",
-		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+		"format": "prettier -w .",
 		"lint": "tslint -p tsconfig.json",
 		"prepublishOnly": "npm test",
 		"version": "npm run format && git add -A src",
 		"postversion": "git push && git push --tags"
-	 },
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/hartmann-jonas/pharos-designer.git"
 	},
-	"keywords": ["pharos", "designer2"],
+	"keywords": [
+		"pharos",
+		"designer2"
+	],
 	"author": "Jonas Hartmann",
 	"license": "ISC",
 	"bugs": {

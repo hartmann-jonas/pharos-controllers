@@ -16,7 +16,7 @@ import { clearInterval } from 'timers'
  * Class to define the PharosClient
  * @author Jonas Hartmann
  */
-class PharosClient {
+export class PharosClient {
 	private host: string
 	private token: string | null
 	private pollTime: number
@@ -51,7 +51,7 @@ class PharosClient {
 	async authenticate(host: string, username: string, password: string): Promise<AuthResponse> {
 		console.log('Authenticating...')
 		if (!isIPv4(host)) {
-            console.error(`The provided host (${host}) does not match the required pattern`)
+			console.error(`The provided host (${host}) does not match the required pattern`)
 			return {
 				success: false,
 				error: `The provided host (${host}) does not match the required pattern`,
@@ -486,5 +486,3 @@ class PharosClient {
 		}
 	}
 }
-
-export default PharosClient
