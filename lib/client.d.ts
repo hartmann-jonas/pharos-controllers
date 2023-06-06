@@ -3,7 +3,7 @@ import { AuthResponse, LogoutResponse, ControlResponse, ControlTimelineOptions, 
  * Class to define the PharosClient
  * @author Jonas Hartmann
  */
-export declare class PharosClient {
+declare class PharosClient {
     private host;
     private token;
     private pollTime;
@@ -61,3 +61,4 @@ export declare class PharosClient {
      */
     getScenes(sceneNumbers?: string): Promise<SceneResponse>;
 }
+export default PharosClient;

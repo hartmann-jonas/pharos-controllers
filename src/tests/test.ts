@@ -1,4 +1,4 @@
-import { PharosClient } from '../client'
+import PharosClient from '../client'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
