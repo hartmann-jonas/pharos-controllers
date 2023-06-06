@@ -1,6 +1,6 @@
 {
 	"name": "pharos-controllers",
-	"version": "2.5.9",
+	"version": "2.0.0",
 	"description": "TypeScript library to control Pharos Lighting controllers via the HTTP rest API",
 	"main": "lib/index.js",
 	"scripts": {
