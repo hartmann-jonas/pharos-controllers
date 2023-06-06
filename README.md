@@ -8,6 +8,7 @@ Library written in TypeScript to control Pharos Lighting controllers via the HTT
 - logout()
 
 ### ONLY DESIGNER
+
 - getTimelines()
 - getGroups()
 - getScenes()
@@ -16,6 +17,7 @@ Library written in TypeScript to control Pharos Lighting controllers via the HTT
 - controlScene()
 
 ### ONLY EXPERT
+
 - getSpaces()
 - controlSpace()
 - controlScene()
@@ -64,13 +66,13 @@ async function example() {
 	await controller.authenticate('admin', 'admin')
 	// returns success true/false if false an error is returned as well
 
-    await controller.getSpaces('1-3')
+	await controller.getSpaces('1-3')
 	// returns info about space 1 till 3
 
-    await controller.controlScene('recall', { num: 5 })
+	await controller.controlScene('recall', { num: 5 })
 	// recalls scene 5 and returns success true/false
 
-    await controller.controlSpace('master_intensity', { num: 3, level: 82.3})
+	await controller.controlSpace('master_intensity', { num: 3, level: 82.3 })
 
 	await controller.logout()
 	// returns success true/false

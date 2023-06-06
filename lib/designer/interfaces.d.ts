@@ -18,7 +18,7 @@ export interface ControlTimelineOptions {
 }
 export interface ControlGroupOptions {
 	num?: number
-	level?: number | string
+	level?: number
 	fade?: number
 	delay?: number
 }

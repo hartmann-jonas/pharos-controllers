@@ -26,7 +26,7 @@ export interface SpaceResponse {
 }
 export interface ControlSpaceOptions {
 	num?: number
-	level?: number | string
+	level?: number
 }
 export interface ControlSceneOptions {
 	num: number
