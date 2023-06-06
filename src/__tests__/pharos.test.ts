@@ -1,9 +1,9 @@
-import { PharosClient } from '..'
+import { DesignerClient } from '../'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 test('Full Test', async () => {
-	const controller = new PharosClient()
+	const controller = new DesignerClient()
 
 	await controller.authenticate('192.168.178.149', 'admin', 'pharos')
 
@@ -21,7 +21,7 @@ test('Full Test', async () => {
 }, 600000)
 
 test('Fail Test', async () => {
-	const controller = new PharosClient()
+	const controller = new DesignerClient()
 
 	await controller.authenticate('http://192.168.178.149', 'admin', 'pharos')
 })
