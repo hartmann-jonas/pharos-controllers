@@ -27,10 +27,10 @@ async function example() {
     const timelines = await controller.getTimelines()
     // returns success and all timelines
 
-	const groups = await controller.getGroups('1-10')
+    const groups = await controller.getGroups('1-10')
     // returns success and groups 1 through 10
 
-	await controller.controlTimeline('start', { num: 7 })
+    await controller.controlTimeline('start', { num: 7 })
     // starts timeline number 7 and returns success true/false
 
     await controller.controlTimeline('release', { fade: 5 })
