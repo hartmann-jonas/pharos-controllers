@@ -16,7 +16,7 @@ import { clearInterval } from 'timers'
  * Class to define the PharosClient
  * @author Jonas Hartmann
  */
-class PharosClient {
+module.exports = class PharosClient {
 	private host: string
 	private token: string | null
 	private pollTime: number
@@ -486,5 +486,3 @@ class PharosClient {
 		}
 	}
 }
-
-export default PharosClient
