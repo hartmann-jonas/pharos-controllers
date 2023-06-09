@@ -461,7 +461,10 @@ export class DesignerClient {
 					this.token = responseData.token
 				}
 				console.log('Scenes recieved')
-				return scenes
+				return {
+					success: true,
+					scenes,
+				}
 			} else if (response.status === 400) {
 				console.error('Invalid request')
 				return {
