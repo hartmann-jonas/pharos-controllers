@@ -8,10 +8,11 @@ test('Full Test', async () => {
 	await controller.authenticate('admin', 'pharos')
 
 	const timelines = await controller.getTimelines()
+	console.log(timelines.success)
 	await controller.getGroups()
 	await controller.getScenes()
 
-	//sleep(300000)
+	sleep(2000)
 
 	await controller.controlTimeline('start', { num: 7 })
 	await controller.controlGroup('master_intensity', { num: 2, level: 100 })
@@ -20,8 +21,15 @@ test('Full Test', async () => {
 	await controller.logout()
 }, 600000)
 
-test('Login Fail Test', async () => {
-	const controller = new DesignerClient('http://192.168.178.149')
+test('Login Fail', async () => {
+	const controller = new DesignerClient('192.168.178.149')
 
-	await controller.authenticate('admin', 'pharos')
+	await controller.authenticate('admin', 'admin')
+
+	await controller.logout()
+})
+
+test('No auth', async () => {
+	const controller = new DesignerClient('192.168.178.149')
+	await controller.controlTimeline('start', { num: 7 })
 })

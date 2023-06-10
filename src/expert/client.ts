@@ -8,7 +8,6 @@ import {
 	SpaceResponse,
 } from './interfaces'
 import { clearInterval } from 'timers'
-import '../index'
 
 /**
  * Class to define the PharosClient
@@ -23,12 +22,10 @@ export class ExpertClient {
 	// internal poll function to keep token up to date
 	// this just calls the getGroups method every 4.5 mins
 	async poll() {
-		console.log('Polling new token')
 		const res = await this.getSpaces()
+		// call the poll again if it was not successful
 		if (!res.success) {
-			console.log('Polling new token failed')
-		} else if (res.success) {
-			console.log('Recieved new token')
+			this.poll()
 		}
 	}
 
@@ -47,9 +44,7 @@ export class ExpertClient {
 	 * @param password The password for authentication.
 	 */
 	async authenticate(username: string, password: string): Promise<AuthResponse> {
-		console.log('Authenticating...')
 		if (!isIPv4(this.host)) {
-			console.error(`The provided host (${this.host}) does not match the required pattern`)
 			return {
 				success: false,
 				error: `The provided host (${this.host}) does not match the required pattern`,
@@ -72,32 +67,27 @@ export class ExpertClient {
 			})
 
 			if (response.ok) {
-				console.log('Authentication successful')
 				// Authentication successful
 				const responseData = await response.json()
 				this.token = await responseData.token
 				if (this.token) {
 					// create poll interval
-					console.log('Creating token poll')
 					this.poll_interval = setInterval(this.poll.bind(this), this.pollTime)
 					this.poll()
 					return {
 						success: true,
 					}
 				}
-				console.error('Error with token')
 				return {
 					success: false,
 					error: 'Error with token',
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -105,7 +95,6 @@ export class ExpertClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured during authentification: ${error}`)
 			return {
 				success: false,
 				error: `An error occured during authentification: ${error}`,
@@ -117,7 +106,6 @@ export class ExpertClient {
 	 * Logout the client.
 	 */
 	async logout(): Promise<LogoutResponse> {
-		console.log('Logout...')
 		const url = `http://${this.host}/logout`
 
 		const headers = new Headers()
@@ -130,7 +118,6 @@ export class ExpertClient {
 			})
 
 			if (response.ok) {
-				console.log('Logout successful')
 				// delete polling interval
 				if (this.poll_interval) {
 					clearInterval(this.poll_interval)
@@ -139,7 +126,6 @@ export class ExpertClient {
 					success: true,
 				}
 			} else {
-				console.error('The response from the controller was not ok')
 				return {
 					success: false,
 					error: 'The response from the controller was not ok',
@@ -147,7 +133,6 @@ export class ExpertClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured while logging out: ${error}`)
 			return {
 				success: false,
 				error: `An error occured while logging out: ${error}`,
@@ -161,7 +146,6 @@ export class ExpertClient {
 	 * @returns The response data containing the fixture groups.
 	 */
 	async getSpaces(spaceNumbers?: string): Promise<SpaceResponse> {
-		console.log(`Getting spaces${spaceNumbers ? ' ' + spaceNumbers : ''}...`)
 		const url = `http://${this.host}/api/group${spaceNumbers ? `?num=${spaceNumbers}` : ''}`
 		const headers = new Headers()
 		headers.append('Content-Type', 'application/json')
@@ -180,19 +164,16 @@ export class ExpertClient {
 				if (responseData.token != undefined) {
 					this.token = responseData.token
 				}
-				console.log('Spaces recieved')
 				return {
 					success: true,
 					spaces,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -200,7 +181,6 @@ export class ExpertClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured while getting the groups: ${error}`)
 			return {
 				success: false,
 				error: `An error occured while getting the groups: ${error}`,
@@ -215,7 +195,6 @@ export class ExpertClient {
 	 * @returns The response data from the control group request.
 	 */
 	async controlSpace(action: 'master_intensity', options: ControlSpaceOptions): Promise<ControlResponse> {
-		console.log('Controlling spaces...')
 		const url = `http://${this.host}/api/group`
 
 		const headers = new Headers()
@@ -243,13 +222,11 @@ export class ExpertClient {
 					success: true,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -257,7 +234,6 @@ export class ExpertClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occurred while controlling the groups: ${error}`)
 			return {
 				success: false,
 				error: `An error occurred while controlling the groups: ${error}`,
@@ -275,7 +251,6 @@ export class ExpertClient {
 		action: 'start' | 'release' | 'toggle',
 		options: ControlSceneOptions
 	): Promise<ControlResponse> {
-		console.log('Controlling scenes...')
 		const url = `http://${this.host}/api/scene`
 
 		const headers = new Headers()

@@ -11,7 +11,6 @@ import {
 	GroupResponse,
 } from './interfaces'
 import { clearInterval } from 'timers'
-import '../index'
 
 /**
  * Class to define the PharosClient
@@ -26,12 +25,10 @@ export class DesignerClient {
 	// internal poll function to keep token up to date
 	// this just calls the getGroups method every 4.5 mins
 	async poll() {
-		console.log('Polling new token')
 		const res = await this.getGroups()
+		// call the poll again if it was not successful
 		if (!res.success) {
-			console.log('Polling new token failed')
-		} else if (res.success) {
-			console.log('Recieved new token')
+			this.poll()
 		}
 	}
 
@@ -50,9 +47,7 @@ export class DesignerClient {
 	 * @param password The password for authentication.
 	 */
 	async authenticate(username: string, password: string): Promise<AuthResponse> {
-		console.log('Authenticating...')
 		if (!isIPv4(this.host)) {
-			console.error(`The provided host (${this.host}) does not match the required pattern`)
 			return {
 				success: false,
 				error: `The provided host (${this.host}) does not match the required pattern`,
@@ -74,32 +69,27 @@ export class DesignerClient {
 			})
 
 			if (response.ok) {
-				console.log('Authentication successful')
 				// Authentication successful
 				const responseData = await response.json()
 				this.token = await responseData.token
 				if (this.token) {
 					// create poll interval
-					console.log('Creating token poll')
 					this.poll_interval = setInterval(this.poll.bind(this), this.pollTime)
 					this.poll()
 					return {
 						success: true,
 					}
 				}
-				console.error('Error with token')
 				return {
 					success: false,
 					error: 'Error with token',
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -107,7 +97,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured during authentification: ${error}`)
 			return {
 				success: false,
 				error: `An error occured during authentification: ${error}`,
@@ -119,7 +108,6 @@ export class DesignerClient {
 	 * Logout the client.
 	 */
 	async logout(): Promise<LogoutResponse> {
-		console.log('Logout...')
 		const url = `http://${this.host}/logout`
 
 		const headers = new Headers()
@@ -132,7 +120,6 @@ export class DesignerClient {
 			})
 
 			if (response.ok) {
-				console.log('Logout successful')
 				// delete polling interval
 				if (this.poll_interval) {
 					clearInterval(this.poll_interval)
@@ -141,7 +128,6 @@ export class DesignerClient {
 					success: true,
 				}
 			} else {
-				console.error('The response from the controller was not ok')
 				return {
 					success: false,
 					error: 'The response from the controller was not ok',
@@ -149,7 +135,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured while logging out: ${error}`)
 			return {
 				success: false,
 				error: `An error occured while logging out: ${error}`,
@@ -163,7 +148,6 @@ export class DesignerClient {
 	 * @returns An array containing the timeline objects.
 	 */
 	async getTimelines(timelineNumbers?: string): Promise<TimelineResponse> {
-		console.log(`Getting timelines${timelineNumbers ? ' ' + timelineNumbers : ''}...`)
 		const url = `http://${this.host}/api/timeline${timelineNumbers ? `?num=${timelineNumbers}` : ''}`
 		const headers = new Headers()
 		headers.append('Content-Type', 'application/json')
@@ -182,19 +166,16 @@ export class DesignerClient {
 				if (responseData.token != undefined) {
 					this.token = responseData.token
 				}
-				console.log('Timelines recieved')
 				return {
 					success: true,
 					timelines,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -202,7 +183,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured while getting the timelines: ${error}`)
 			return {
 				success: false,
 				error: `An error occured while getting the timelines: ${error}`,
@@ -220,7 +200,6 @@ export class DesignerClient {
 		action: 'start' | 'release' | 'toggle' | 'pause' | 'resume' | 'set_rate' | 'set_position',
 		options: ControlTimelineOptions
 	): Promise<ControlResponse> {
-		console.log('Controlling timeline...')
 		const url = `http://${this.host}/api/timeline`
 
 		const headers = new Headers()
@@ -247,13 +226,11 @@ export class DesignerClient {
 					success: true,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -261,7 +238,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occurred while controlling the timeline: ${error}`)
 			return {
 				success: false,
 				error: `An error occurred while controlling the timeline: ${error}`,
@@ -275,7 +251,6 @@ export class DesignerClient {
 	 * @returns The response data containing the fixture groups.
 	 */
 	async getGroups(groupNumbers?: string): Promise<GroupResponse> {
-		console.log(`Getting groups${groupNumbers ? ' ' + groupNumbers : ''}...`)
 		const url = `http://${this.host}/api/group${groupNumbers ? `?num=${groupNumbers}` : ''}`
 		const headers = new Headers()
 		headers.append('Content-Type', 'application/json')
@@ -294,19 +269,16 @@ export class DesignerClient {
 				if (responseData.token != undefined) {
 					this.token = responseData.token
 				}
-				console.log('Groups recieved')
 				return {
 					success: true,
 					groups,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -314,7 +286,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occured while getting the groups: ${error}`)
 			return {
 				success: false,
 				error: `An error occured while getting the groups: ${error}`,
@@ -329,7 +300,6 @@ export class DesignerClient {
 	 * @returns The response data from the control group request.
 	 */
 	async controlGroup(action: 'master_intensity', options: ControlGroupOptions): Promise<ControlResponse> {
-		console.log('Controlling groups...')
 		const url = `http://${this.host}/api/group`
 
 		const headers = new Headers()
@@ -357,13 +327,11 @@ export class DesignerClient {
 					success: true,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -371,7 +339,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occurred while controlling the groups: ${error}`)
 			return {
 				success: false,
 				error: `An error occurred while controlling the groups: ${error}`,
@@ -389,7 +356,6 @@ export class DesignerClient {
 		action: 'start' | 'release' | 'toggle',
 		options: ControlSceneOptions
 	): Promise<ControlResponse> {
-		console.log('Controlling scenes...')
 		const url = `http://${this.host}/api/scene`
 
 		const headers = new Headers()
@@ -442,7 +408,6 @@ export class DesignerClient {
 	 * @returns An array of Scene objects representing the scenes and their states.
 	 */
 	async getScenes(sceneNumbers?: string): Promise<SceneResponse> {
-		console.log(`Getting scenes${sceneNumbers ? ' ' + sceneNumbers : ''}...`)
 		const url = `http://${this.host}/api/scene${sceneNumbers ? `?num=${sceneNumbers}` : ''}`
 		const headers = new Headers()
 		headers.append('Content-Type', 'application/json')
@@ -461,19 +426,16 @@ export class DesignerClient {
 				if (responseData.token != undefined) {
 					this.token = responseData.token
 				}
-				console.log('Scenes recieved')
 				return {
 					success: true,
 					scenes,
 				}
 			} else if (response.status === 400) {
-				console.error('Invalid request')
 				return {
 					success: false,
 					error: 'Invalid request',
 				}
 			} else {
-				console.error('Authentification failed')
 				return {
 					success: false,
 					error: 'Authentification failed',
@@ -481,7 +443,6 @@ export class DesignerClient {
 			}
 		} catch (error) {
 			// Network or server error
-			console.error(`An error occurred while getting the scenes: ${error}`)
 			return {
 				success: false,
 				error: `An error occurred while getting the scenes: ${error}`,
