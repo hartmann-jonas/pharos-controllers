@@ -8,6 +8,7 @@ import {
 	SpaceResponse,
 } from './interfaces'
 import { clearInterval } from 'timers'
+import '../index'
 
 /**
  * Class to define the PharosClient

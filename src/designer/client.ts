@@ -11,6 +11,7 @@ import {
 	GroupResponse,
 } from './interfaces'
 import { clearInterval } from 'timers'
+import '../index'
 
 /**
  * Class to define the PharosClient
