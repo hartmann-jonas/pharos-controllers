@@ -14,6 +14,13 @@ export interface ControlResponse {
 }
 
 // INTERFACES FOR PHAROS DESIGNER
+// INTERFACES FOR HTTP POST METHODS
+
+export interface ControlTriggerOptions {
+	num?: number
+	var?: string
+	conditions?: boolean
+}
 
 export interface ControlTimelineOptions {
 	num?: number
@@ -33,6 +40,29 @@ export interface ControlSceneOptions {
 	num?: number
 	fade?: number
 	group?: string
+}
+
+// INTERFACES FOR HTTP RESPONSES
+
+interface Trigger {
+	type: string
+	num: number
+	name: string
+	group: string
+	description: string
+	trigger_text: string
+	conditions: TriggerObject[]
+	actions: TriggerObject[]
+}
+
+interface TriggerObject {
+	text: string
+}
+
+export interface TriggerResponse {
+	success: boolean
+	triggers?: Trigger[]
+	error?: string
 }
 
 interface Timeline {

@@ -3,9 +3,11 @@ import {
 	AuthResponse,
 	LogoutResponse,
 	ControlResponse,
+	ControlTriggerOptions,
 	ControlTimelineOptions,
 	ControlGroupOptions,
 	ControlSceneOptions,
+	TriggerResponse,
 	TimelineResponse,
 	SceneResponse,
 	GroupResponse,
@@ -138,6 +140,106 @@ export class DesignerClient {
 			return {
 				success: false,
 				error: `An error occured while logging out: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Control the trigger of the project.
+	 * @param action The action fire a trigger.
+	 * @param options Additional options for firing the trigger.
+	 * @returns The response data from the control trigger request.
+	 */
+	async controlTrigger(action: 'fire', options: ControlTriggerOptions): Promise<ControlResponse> {
+		const url = `http://${this.host}/api/trigger`
+
+		const headers = new Headers()
+		headers.append('Content-Type', 'application/json')
+		headers.append('Authorization', `Bearer ${this.token}`)
+		const body = {
+			action,
+			...options,
+		}
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: headers,
+				body: JSON.stringify(body),
+			})
+			// this response returns a 204 (no-content)
+			// the docs state that a new token should be returned
+			// this is not critical since the 4.5min timer takes
+			// care of always having a valid token
+			// https://pharos-controller-api.readthedocs.io/en/latest/guide/web-api-authentication.html#token-authentication
+			if (response.status === 204) {
+				return {
+					success: true,
+				}
+			} else if (response.status === 400) {
+				return {
+					success: false,
+					error: 'Invalid request',
+				}
+			} else {
+				return {
+					success: false,
+					error: 'Authentification failed',
+				}
+			}
+		} catch (error) {
+			// Network or server error
+			return {
+				success: false,
+				error: `An error occurred while controlling the timeline: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Get information about the triggers in the project.
+	 * @param triggerNumbers Optional. The trigger numbers to filter the results.
+	 * @returns An array containing the trigger objects.
+	 */
+	async getTriggers(triggerNumbers?: string): Promise<TriggerResponse> {
+		const url = `http://${this.host}/api/trigger${triggerNumbers ? `?num=${triggerNumbers}` : ''}`
+		const headers = new Headers()
+		headers.append('Content-Type', 'application/json')
+		headers.append('Authorization', `Bearer ${this.token}`)
+
+		try {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: headers,
+			})
+
+			if (response.ok) {
+				const responseData = await response.json()
+				const triggers = responseData.triggers
+				// Update token
+				if (responseData.token != undefined) {
+					this.token = responseData.token
+				}
+				return {
+					success: true,
+					triggers,
+				}
+			} else if (response.status === 400) {
+				return {
+					success: false,
+					error: 'Invalid request',
+				}
+			} else {
+				return {
+					success: false,
+					error: 'Authentification failed',
+				}
+			}
+		} catch (error) {
+			// Network or server error
+			return {
+				success: false,
+				error: `An error occured while getting the triggers: ${error}`,
 			}
 		}
 	}

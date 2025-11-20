@@ -17,9 +17,11 @@ Library written in TypeScript to control Pharos Lighting controllers via the HTT
 - getTimelines()
 - getGroups()
 - getScenes()
+- getTriggers()
 - controllTimeline()
 - controlGroup()
 - controlScene()
+- controlTrigger()
 
 ### ONLY EXPERT
 
